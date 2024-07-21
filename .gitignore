@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+#costom
+build
+out

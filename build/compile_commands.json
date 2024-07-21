@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/Users/cjh/Desktop/file/cpp/cpp_learn/build",
-  "command": "/Library/Developer/CommandLineTools/usr/bin/c++   -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/SeqStack.dir/SeqStack.cpp.o -c /Users/cjh/Desktop/file/cpp/cpp_learn/SeqStack.cpp",
-  "file": "/Users/cjh/Desktop/file/cpp/cpp_learn/SeqStack.cpp",
-  "output": "CMakeFiles/SeqStack.dir/SeqStack.cpp.o"
-}
-]
