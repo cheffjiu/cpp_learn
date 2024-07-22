@@ -19,6 +19,7 @@ private:
         delete[] _pstack;
         _pstack = _newStack;
         _capacity *= 2;
+        _newStack=nullptr;
     }
 
 public:
