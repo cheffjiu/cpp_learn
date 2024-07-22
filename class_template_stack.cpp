@@ -4,9 +4,9 @@ using namespace std;
 template <typename T>
 class SeqStack
 {
+
 public:
-    //SeqStack(int capacity = 10) : _pstack(new T[capacity]), _top(-1), _capacity(capacity) {}
-    SeqStack(int capacity = 10, int top = -1) : _pstack(new T[capacity]), _top(top), _capacity(capacity) {}    
+        SeqStack(int capacity = 10, int top = -1) : _pstack(new T[capacity]), _top(top), _capacity(capacity) {}    
     
     SeqStack(const SeqStack<T> &stack){
         _pstack = new T[stack._capacity];
