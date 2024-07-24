@@ -6,6 +6,8 @@ private:
     int real;
     int imag;
     friend complex operator+(const complex &c1, const complex &c2);
+    friend ostream &operator<<(ostream &out, const complex &c);
+    friend istream &operator>>(istream &in, complex &c);
 
 public:
     complex(int r = 0, int i = 0) : real(r), imag(i) {}
@@ -40,6 +42,16 @@ complex operator+(const complex &c1, const complex &c2)
 {
     return complex(c1.real + c2.real, c1.imag + c2.imag);
 }
+ostream &operator<<(ostream &out, const complex &c)
+{
+    out << "real: " << c.real << ", imag: " << c.imag;
+    return out;
+}
+istream &operator>>(istream &in, complex &c)
+{
+    in >> c.real >> c.imag;
+    return in;
+}
 int main()
 {
     complex c1(2, 3);
@@ -58,8 +70,12 @@ int main()
     complex c7 = c2++;
     c7.show();
     c2.show();
-    complex c8 ;
-    c8+= c1;
+    complex c8;
+    c8 += c1;
     c8.show();
+    cout << c8 << endl;
+    cin >> c1;
+    cout << c1 << endl;
+
     return 0;
 }
