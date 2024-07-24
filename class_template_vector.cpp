@@ -25,7 +25,7 @@ namespace me
         }
     };
 
-    template <typename T=int, typename Alloc = Allocator<T>>
+    template <typename T = int, typename Alloc = Allocator<T>>
     class vector
     {
     public:
@@ -109,7 +109,24 @@ namespace me
             _allocator.deallocate(_first);
             _first = _last = _end = nullptr;
         }
-
+        T &operator[](int index) const
+        {
+            if (index < 0 || index >= size())
+                throw std::out_of_range("index out of range");
+            return _first[index];
+        }
+        class iterator
+        {
+        public:
+            iterator(T *ptr = nullptr) : _ptr(ptr) {}
+            bool operator!=(const iterator &other) const { return _ptr!= other._ptr; }
+            void operator++() { ++_ptr; }
+            T& operator*() const { return *_ptr; }
+        private:
+            T *_ptr;
+        };
+        iterator begin() const { return iterator(_first); }
+        iterator end() const { return iterator(_last); }
     private:
         T *_first;
         T *_last;
@@ -152,5 +169,18 @@ int main()
     me::vector<int> v2(v1);
     v1.push_back(10);
     cout << v2.back() << endl;
+    cout<<v2[1]<<endl;
+    me::vector<int> v3(10);
+    for(int i=0;i<v3.size();i++){
+        v3.push_back(rand()%100);
+    }
+    me::vector<int>::iterator it = v3.begin();
+    for(;it!=v3.end();++it){
+        cout<<*it<<" ";
+    }
+    cout<<endl;
+    for(auto p:v3){
+        cout<<p<<" ";
+    }
     return 0;
 }
