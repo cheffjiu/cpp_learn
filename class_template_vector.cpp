@@ -84,6 +84,7 @@ namespace me
             {
                 return;
             }
+            verify(_last - 1, _last);
             _last--;
             _allocator.destroy(_last);
         }
@@ -118,20 +119,115 @@ namespace me
         class iterator
         {
         public:
-            iterator(T *ptr = nullptr) : _ptr(ptr) {}
-            bool operator!=(const iterator &other) const { return _ptr!= other._ptr; }
-            void operator++() { ++_ptr; }
-            T& operator*() const { return *_ptr; }
+            friend class vector<T, Alloc>;
+            iterator(vector<T, Alloc> *pVec = nullptr, T *ptr = nullptr) : _ptr(ptr), _pVec(pVec)
+            {
+                Iterator_Base *itb = new Iterator_Base(this, _pVec->_head._next);
+                _pVec->_head._next = itb;
+            }
+            bool operator!=(const iterator &it) const
+            {
+                if (_pVec == nullptr || _pVec != it._pVec)
+                {
+                    throw("iterator incompatible vectors");
+                }
+                return _ptr != it._ptr;
+            }
+
+            void operator++()
+            {
+                if (_pVec = nullptr)
+                {
+                    throw("iterator incompatible vectors");
+                }
+                ++_ptr;
+            }
+            T &operator*() const
+            {
+                if (_pVec == nullptr)
+                {
+                    throw("iterator incompatible vectors");
+                }
+                return *_ptr;
+            }
+
         private:
             T *_ptr;
+            vector<T, Alloc> *_pVec;
         };
-        iterator begin() const { return iterator(_first); }
-        iterator end() const { return iterator(_last); }
+        iterator begin() const { return iterator(this, _first); }
+        iterator end() const { return iterator(this, _last); }
+        void verify(T *first, T *last) const
+        {
+            Iterator_Base *pre = &this->_head;
+            Iterator_Base *it = this->_head._next;
+            while (it != nullptr)
+            {
+                if (it->_cur->_ptr >= first && it->_cur->ptr <= last)
+                {
+                    it->_cur->_pVec = nullptr;
+                    pre->_next = it->_next;
+                    delete it;
+                    it = pre->_next;
+                }
+                else
+                {
+                    pre = it;
+                    it = it->_next;
+                }
+            }
+        }
+        iterator insert(iterator it, const T &value)
+        {
+            /* 不考虑扩容
+               不考虑it._ptr的指针合法性
+             */
+            verify(it._ptr - 1, _last);
+            T *p = _last;
+            while (p > it._ptr)
+            {
+                _allocator.construct(p, *(p - 1));
+                _allocator.destroy(p - 1);
+                p--;
+            }
+
+            _allocator.construct(p, value);
+            _last++;
+            return iterator(this, p);
+        }
+        iterator erase(iterator it)
+        {
+            /* 不考虑it._ptr的指针合法性
+               保证最后一个元素可以安全删除
+               注意it._ptr在vector中可能不是_first
+             */
+            verify(it._ptr - 1, _last);
+            T *p = it._ptr;
+            while (p < _last - 1)
+            {
+                _allocator.destroy(p);
+                _allocator.construct(p, *(p + 1));
+
+                p++;
+            }
+            _allocator.destroy(p);
+            _last--;
+            return iterator(this, it._ptr);
+        }
+
     private:
         T *_first;
         T *_last;
         T *_end;
         Alloc _allocator;
+        struct Iterator_Base
+        {
+            Iterator_Base(iterator *c = nullptr, Iterator_Base *n = nullptr) : _cur(c), _next(n) {}
+            iterator *_cur;
+            Iterator_Base *_next;
+        };
+        Iterator_Base _head;
+
         void expand()
         {
             int newSize = size() * 2;
@@ -169,18 +265,49 @@ int main()
     me::vector<int> v2(v1);
     v1.push_back(10);
     cout << v2.back() << endl;
-    cout<<v2[1]<<endl;
+    cout << v2[1] << endl;
     me::vector<int> v3(10);
-    for(int i=0;i<v3.size();i++){
-        v3.push_back(rand()%100);
+    for (int i = 0; i < v3.size(); i++)
+    {
+        v3.push_back(rand() % 100);
     }
     me::vector<int>::iterator it = v3.begin();
-    for(;it!=v3.end();++it){
-        cout<<*it<<" ";
+    for (; it != v3.end(); ++it)
+    {
+        cout << *it << " ";
     }
-    cout<<endl;
-    for(auto p:v3){
-        cout<<p<<" ";
+    cout << endl;
+    for (auto p : v3)
+    {
+        cout << p << " ";
     }
+    me::vector<int> vec(30);
+    for (size_t i = 0; i < vec.size(); i++)
+    {
+        vec.push_back(i * 2);
+    }
+    me::vector<int> vec1(vec);
+    auto it2 = vec.begin();
+    for (; it != vec.end(); ++it2)
+    {
+        if (*it2 % 2 == 0)
+        {
+            it2 = vec.insert(it2, *it2 - 1);
+            ++it2;
+        }
+    }
+    auto it3 = vec1.begin();
+    while (it3 != vec1.end())
+    {
+        if (*it3 % 2 == 0)
+        {
+            it3 = vec1.erase(it3);
+        }
+        else
+        {
+            ++it3;
+        }
+    }
+
     return 0;
 }
