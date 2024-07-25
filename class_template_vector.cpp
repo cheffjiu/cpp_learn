@@ -29,12 +29,12 @@ namespace me
     class vector
     {
     public:
-        vector(int size = 10)
-        {
-            _first = _allocator.allocate(size);
+        vector(int size = 10){
+            _first=_allocator.allocate(size);
             _last = _first;
             _end = _first + size;
         }
+       
         vector(const vector<T> &other)
         {
             _first = _allocator.allocate(other.size());
@@ -84,7 +84,7 @@ namespace me
             {
                 return;
             }
-            verify(_last - 1, _last);
+           // verify(_last - 1, _last);
             _last--;
             _allocator.destroy(_last);
         }
@@ -119,42 +119,48 @@ namespace me
         class iterator
         {
         public:
-            friend class vector<T, Alloc>;
-            iterator(vector<T, Alloc> *pVec = nullptr, T *ptr = nullptr) : _ptr(ptr), _pVec(pVec)
+           // friend class vector<T, Alloc>;
+            iterator(T *ptr = nullptr) : _ptr(ptr) {}
+#if 0
+            iterator(vector<T, Alloc> *pVec = nullptr, T *ptr = nullptr) : _pVec(pVec), _ptr(ptr)
             {
                 Iterator_Base *itb = new Iterator_Base(this, _pVec->_head._next);
                 _pVec->_head._next = itb;
             }
+#endif
             bool operator!=(const iterator &it) const
             {
-                if (_pVec == nullptr || _pVec != it._pVec)
-                {
-                    throw("iterator incompatible vectors");
-                }
+                /*  if (_pVec == nullptr || _pVec != it._pVec)
+                 {
+                     throw("iterator incompatible vectors");
+                 } */
                 return _ptr != it._ptr;
             }
 
             void operator++()
             {
-                if (_pVec = nullptr)
+                /* if (_pVec == nullptr)
                 {
                     throw("iterator incompatible vectors");
-                }
+                } */
                 ++_ptr;
             }
             T &operator*() const
             {
-                if (_pVec == nullptr)
+                /* if (_pVec == nullptr)
                 {
                     throw("iterator incompatible vectors");
-                }
+                } */
                 return *_ptr;
             }
 
         private:
+            //  vector<T, Alloc> *_pVec;
             T *_ptr;
-            vector<T, Alloc> *_pVec;
         };
+        iterator begin() const { return iterator(_first); }
+        iterator end() const { return iterator(_last); }
+#if 0
         iterator begin() const { return iterator(this, _first); }
         iterator end() const { return iterator(this, _last); }
         void verify(T *first, T *last) const
@@ -214,12 +220,13 @@ namespace me
             _last--;
             return iterator(this, it._ptr);
         }
-
+#endif
     private:
         T *_first;
         T *_last;
         T *_end;
         Alloc _allocator;
+#if 0
         struct Iterator_Base
         {
             Iterator_Base(iterator *c = nullptr, Iterator_Base *n = nullptr) : _cur(c), _next(n) {}
@@ -227,7 +234,7 @@ namespace me
             Iterator_Base *_next;
         };
         Iterator_Base _head;
-
+#endif
         void expand()
         {
             int newSize = size() * 2;
@@ -281,6 +288,7 @@ int main()
     {
         cout << p << " ";
     }
+#if 0
     me::vector<int> vec(30);
     for (size_t i = 0; i < vec.size(); i++)
     {
@@ -308,6 +316,6 @@ int main()
             ++it3;
         }
     }
-
+#endif
     return 0;
 }
